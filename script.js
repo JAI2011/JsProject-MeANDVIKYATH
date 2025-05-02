@@ -3,6 +3,7 @@ const ctx = canvas.getContext("2d");
 
 const gravity = 0.5;
 var groundLevel = 350;
+var island1 = 250;
 
 const keys = {};
 
@@ -44,6 +45,8 @@ class Player {
       this.onGround = true;
     }
 
+    
+
     if (this.x < 0) this.x = 0;
     if (this.x + this.width > canvas.width) this.x = canvas.width - this.width;
   }
@@ -65,10 +68,16 @@ function drawGround() {
   ctx.fillRect(0, groundLevel, canvas.width, canvas.height - groundLevel);
 }
 
+function drawIsland() {
+  ctx.fillStyle = "#8B4513"; 
+  ctx.fillRect(400, island1, canvas.width, 20); 
+}
+
 function gameLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   drawGround();
+  drawIsland();
 
   player1.update();
   player2.update();
