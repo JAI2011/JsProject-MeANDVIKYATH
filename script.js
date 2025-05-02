@@ -1,95 +1,82 @@
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
 
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
+const gravity = 0.5;
+var groundLevel = 350;
 
-    const gravity = 0.5;
-    var groundLevel = 350;
+const keys = {};
 
-    const keys = {};
+class Player {
+  constructor(x, color, leftKey, rightKey, jumpKey) {
+    this.x = x;
+    this.y = groundLevel - 50;
+    this.width = 40;
+    this.height = 50;
+    this.color = color;
+    this.velX = 0;
+    this.velY = 0;
+    this.speed = 3;
+    this.jumpPower = -10;
+    this.onGround = false;
+    this.leftKey = leftKey;
+    this.rightKey = rightKey;
+    this.jumpKey = jumpKey;
+  }
 
-    class Player {
-      
-      constructor(x, color, leftKey, rightKey, jumpKey) {
-        this.x = x;
-        this.y = groundLevel - 50;
-        this.width = 40;
-        this.height = 50;
-        this.color = color;
-        this.velX = 0;
-        this.velY = 0;
-        this.speed = 3;
-        this.jumpPower = -10;
-        this.onGround = false;
-        this.leftKey = leftKey;
-        this.rightKey = rightKey;
-        this.jumpKey = jumpKey;
-      }
+  update() {
+    if (keys[this.leftKey]) this.velX = -this.speed;
+    else if (keys[this.rightKey]) this.velX = this.speed;
+    else this.velX = 0;
 
-      update() {
-        
-
-        // Horizontal movement
-        if (keys[this.leftKey]) this.velX = -this.speed;
-        else if (keys[this.rightKey]) this.velX = this.speed;
-        else this.velX = 0;
-
-        // Jump
-        if (keys[this.jumpKey] && this.onGround) {
-          this.velY = this.jumpPower;
-          this.onGround = false;
-        }
-
-        // Gravity
-        this.velY += gravity;
-
-        // Position update
-        this.x += this.velX;
-        this.y += this.velY;
-
-        // Ground collision
-        if (this.y + this.height > groundLevel) {
-          this.y = groundLevel - this.height;
-          this.velY = 0;
-          this.onGround = true;
-        }
-
-        // Player collision with other player
-        
-
-        // Wall bounds
-        if (this.x < 0) this.x = 0;
-        if (this.x + this.width > canvas.width) this.x = canvas.width - this.width;
-      }
-
-      draw() {
-        ctx.fillStyle = this.color;
-        ctx.fillRect(this.x, this.y, this.width, this.height);
-      }
+    if (keys[this.jumpKey] && this.onGround) {
+      this.velY = this.jumpPower;
+      this.onGround = false;
     }
 
-    const player1 = new Player(100, "red", "a", "d", "w");
-    const player2 = new Player(1400, "blue", "ArrowLeft", "ArrowRight", "ArrowUp");
+    this.velY += gravity;
 
-    window.addEventListener("keydown", e => keys[e.key] = true);
-    window.addEventListener("keyup", e => keys[e.key] = false);
+    this.x += this.velX;
+    this.y += this.velY;
 
-    function drawGround() {
-      ctx.fillStyle = "#444";
-      ctx.fillRect(0, groundLevel, canvas.width, canvas.height - groundLevel);
+    if (this.y + this.height > groundLevel) {
+      this.y = groundLevel - this.height;
+      this.velY = 0;
+      this.onGround = true;
     }
 
-    function gameLoop() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (this.x < 0) this.x = 0;
+    if (this.x + this.width > canvas.width) this.x = canvas.width - this.width;
+  }
 
-      drawGround();
+  draw() {
+    ctx.fillStyle = this.color;
+    ctx.fillRect(this.x, this.y, this.width, this.height);
+  }
+}
 
-      player1.update();
-      player2.update();
+const player1 = new Player(100, "red", "a", "d", "w");
+const player2 = new Player(1400, "blue", "ArrowLeft", "ArrowRight", "ArrowUp");
 
-      player1.draw();
-      player2.draw();
+window.addEventListener("keydown", e => keys[e.key] = true);
+window.addEventListener("keyup", e => keys[e.key] = false);
 
-      requestAnimationFrame(gameLoop);
-    }
+function drawGround() {
+  ctx.fillStyle = "#444";
+  ctx.fillRect(0, groundLevel, canvas.width, canvas.height - groundLevel);
+}
 
-    gameLoop();
+function gameLoop() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  drawGround();
+
+  player1.update();
+  player2.update();
+
+  player1.draw();
+  player2.draw();
+
+  requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
